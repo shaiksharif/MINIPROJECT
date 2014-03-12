@@ -1,0 +1,119 @@
+<%@ page import="java.util.*, java.sql.*,shiak.utility.*" %>
+
+<html>
+<head>
+<title>Simple pagination in jsp</title>
+</head>
+
+<body bgcolor="pink" text="blue">
+<b>Simple pagination in JSP</b>
+<form target="_top" name=viewForm action="detailsgg.jsp" method="post">
+<%! int numPages = 0; %>
+<%
+String columnName = "";
+int count = 0;
+int totalCols = 0;
+int increment = 1;
+int numRows = 0;
+
+String startIndexString = request.getParameter("startIndex");
+
+if(startIndexString == null) {
+startIndexString = "0";
+}
+
+int startIndex = Integer.parseInt(startIndexString);
+
+try{
+
+//totalCols = 1;
+%>
+<table border=1 align=center width="75%" cellspacing="0" cellpadding="0">
+<tr><th>Empid</th><th>EmpName</th><th>Sal</th><th>Job</th><th>DeptNo</th></tr>
+<%
+
+
+ArrayList list = (ArrayList)session.getAttribute("groupList");
+//System.out.println("list"+list);
+numRows = list.size();
+
+out.println(" total no. of records : "+ numRows );
+
+int numRecordsPerPage = 4;
+
+out.println(" Num of Records per page : " + numRecordsPerPage + "\n" );
+
+numPages = numRows /numRecordsPerPage ;
+
+int remain = numRows % numRecordsPerPage ;
+
+if(remain != 0){
+
+numPages = numPages +1 ;
+}
+out.println(" \n no. of pages : " + numPages );
+
+if((startIndex + numRecordsPerPage) <= numRows) {
+
+increment = startIndex + numRecordsPerPage ;
+}
+else{
+
+if(remain == 0){
+
+increment = startIndex + numRecordsPerPage ;
+
+}else{
+
+increment = startIndex + remain;
+}
+}
+
+for(count = startIndex; count < increment; count++) {
+
+%><tr>
+<%
+ Employee e=(Employee)list.get(count); %>
+ <td><%=e.getEmpid() %></td>
+ <td><%=e.getEname()%></td>
+ <td><%=e.getSalary()%></td>
+ <td><%=e.getJob()%></td>
+ <td><%=e.getDeptno()%></td>
+ <%
+}
+%></tr>
+</table>
+<br>
+<br>
+<%
+
+%>
+<table width = "100%" cellspacing="0" cellpadding="0">
+<tr>
+Displaying Records:
+<% if(startIndex + numRecordsPerPage < numRows){%>
+<%= " " + startIndex %> - <%= increment - 1 %>
+<%}else{%>
+<%= " " + startIndex %> - <%= numRows %>
+<%}%>
+
+<%if(startIndex !=0) {%>
+<a href="details.jsp?startIndex=<%=startIndex-numRecordsPerPage%>">Previous</a>
+<%}%>
+
+<%increment += numRecordsPerPage ;%>
+<%if(startIndex + numRecordsPerPage <= numRows){%>
+<a href="details.jsp?startIndex=<%=startIndex+numRecordsPerPage %>">Next</a>
+
+<%}%>
+</tr>
+</table>
+<%
+}catch(Exception exc){
+out.println(exc.toString());
+} // end try-catch
+%>
+
+</form>
+</body>
+</html>
